@@ -239,3 +239,20 @@ async function checkURL() {
         }, 1000);  // 1-second delay before hiding the loader
     }
 }
+urlInput.addEventListener("keypress", function(event) {
+    if (event.key === "Enter") {
+        checkURL();
+    }
+});
+
+document.getElementById("pasteButton").addEventListener("click", function() {
+    navigator.clipboard.readText().then(text => {
+        urlInput.value = text;
+        checkURL();
+    }).catch(e => {
+        console.error("Failed to paste clipboard contents", e);
+    });
+});
+
+themeToggle.addEventListener("click", toggleTheme);
+checkButton.addEventListener("click", checkURL);
