@@ -217,3 +217,81 @@ footer p {
     vertical-align: middle;
     animation: highlightImage 1.5s ease-in-out infinite;  /* Infinite animation */
 }
+.logo {
+    width: 30px;  /* Adjust size as needed */
+    height: auto; /* Maintain aspect ratio */
+    vertical-align: middle; /* Align the logo with the text */
+    margin-right: 10px; /* Add space between the logo and the text */
+}
+/* Ensure text fits properly on smaller screens */
+@media screen and (max-width: 600px) {
+    /* Adjust the safe title and recommendation background */
+    .safe-title, .safe-recommendation {
+        font-size: 16px;  /* Reduce font size on small screens */
+        padding: 10px;    /* Ensure there's some padding to avoid overflow */
+        word-wrap: break-word;  /* Ensure long text breaks and doesn't overflow */
+        box-sizing: border-box; /* Ensure padding doesn't cause overflow */
+        width: 100%;  /* Ensure elements take up the full width of their container */
+        overflow: hidden;  /* Hide any overflow */
+    }
+
+    /* Reduce font size for general text to fit better on smaller screens */
+    .result ul li {
+        font-size: 14px;  /* Reduce font size for list items */
+    }
+
+    /* Adjust margins and paddings for overall result sections */
+    .result {
+        padding: 15px;  /* Ensure there's some space around the result */
+        box-sizing: border-box; /* Ensure padding doesn't cause overflow */
+        max-width: 100%; /* Prevent the result container from overflowing */
+    }
+
+    /* Ensure the result container is responsive */
+    #result {
+        max-width: 99%;
+        overflow: hidden; /* Prevent overflow */
+    }
+
+    /* Reduce size of icons for mobile */
+    .result img {
+        width: 50px;  /* Adjust size of icons */
+        height: auto;
+    }
+
+    /* Adjust title font size and spacing for mobile */
+    h1 {
+        font-size: 24px;  /* Make the title smaller on mobile */
+        text-align: center;  /* Center the title */
+    }
+
+    /* Adjust theme toggle button size */
+    #toggleTheme {
+        width: 40px;  /* Smaller toggle button for mobile */
+        height: 40px;
+    }
+
+    /* Adjust the input field size for better mobile usability */
+    #urlInput {
+        font-size: 16px;
+        padding: 10px;
+        width: 98%;
+    }
+}
+@media screen and (max-width: 600px) {
+    /* Add padding to the form container to prevent overflow */
+    .input-form {
+        padding: 0 15px;  /* Add horizontal padding to the form */
+    }
+
+    /* Adjust the URL input field */
+    #urlInput {
+        font-size: 16px;         /* Adjust font size for readability */
+        padding: 10px 15px;      /* Add padding inside the input for comfort */
+        width: 98%;             /* Make the input field take full width */
+        box-sizing: border-box;  /* Include padding and borders in the width calculation */
+        margin: 0;               /* Remove margin to avoid overflow */
+        border-radius: 5px;      /* Optional: Give it rounded corners */
+        border: 1px solid #ccc;  /* Optional: Add a border for better focus */
+    }
+}
