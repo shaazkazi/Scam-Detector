@@ -1,0 +1,82 @@
+{
+    "manifest_version": 3,
+    "name": "URL Scam Detector",
+    "version": "1.0",
+    "description": "Detect and analyze scam URLs",
+    "theme_color": "#000000",
+    "background_color": "#000000",
+    "display": "standalone",
+    "orientation": "portrait",
+    "scope": "/",
+    "start_url": "/",
+    "icons": [
+      {
+        "src": "/assets/icons/icon-72x72.png",
+        "sizes": "72x72",
+        "type": "image/png"
+      },
+      {
+        "src": "/assets/icons/icon-96x96.png",
+        "sizes": "96x96",
+        "type": "image/png"
+      },
+      {
+        "src": "/assets/icons/icon-128x128.png",
+        "sizes": "128x128",
+        "type": "image/png"
+      },
+      {
+        "src": "/assets/icons/icon-144x144.png",
+        "sizes": "144x144",
+        "type": "image/png"
+      },
+      {
+        "src": "/assets/icons/icon-152x152.png",
+        "sizes": "152x152",
+        "type": "image/png"
+      },
+      {
+        "src": "/assets/icons/icon-192x192.png",
+        "sizes": "192x192",
+        "type": "image/png"
+      },
+      {
+        "src": "/assets/icons/icon-384x384.png",
+        "sizes": "384x384",
+        "type": "image/png"
+      },
+      {
+        "src": "/assets/icons/icon-512x512.png",
+        "sizes": "512x512",
+        "type": "image/png"
+      }
+    ],
+    "action": {
+      "default_popup": "popup.html",
+      "default_icon": "/assets/icons/icon-72x72.png"
+    },
+    "background": {
+      "service_worker": "background.js"
+    },
+    "permissions": [
+      "storage"
+    ],
+    "form_factors": ["phone", "tablet"],
+    "screenshots": [
+      {
+        "src": "/assets/screenshots/screenshot-mob.png",
+        "sizes": "1170x1992",
+        "type": "image/png",
+        "platform": "mobile",
+        "orientation": "portrait"
+      },
+      {
+        "src": "/assets/screenshots/screenshot-web.png",
+        "sizes": "1896x852",
+        "type": "image/png",
+        "platform": "web",
+        "orientation": "landscape"
+      }
+    ]
+  }
+  

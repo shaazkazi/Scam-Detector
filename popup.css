@@ -1,0 +1,59 @@
+body {
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 10px;
+    background-color: #121212;
+    color: #ffffff;
+}
+
+header h1 {
+    font-size: 18px;
+    color: #ffba08;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+input {
+    width: 90%;
+    padding: 10px;
+    font-size: 14px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    outline: none;
+}
+
+button {
+    width: 100%;
+    padding: 10px;
+    font-size: 14px;
+    border: none;
+    border-radius: 5px;
+    background-color: #ffba08;
+    color: #000000;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #d9a208;
+}
+
+#result {
+    margin-top: 10px;
+    text-align: center;
+}
+
+#resultMessage {
+    font-weight: bold;
+}
+/* Set the width and height of the popup */
+body {
+    width: 300px;
+    height: 400px;
+    padding: 20px;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+  }
+  
+  /* You can adjust the sizes further as needed */
+  
