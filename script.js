@@ -72,10 +72,32 @@ function checkURL() {
             return;
         }
 
-        const trustedTlds = ["com", "org", "net", "edu", "gov"];
-        const suspiciousTlds = ["tk", "ml", "ga", "cf", "gq"];
-        const suspiciousKeywords = ["free", "win", "prize", "gift", "click", "verify", "update", "urgent"];
-
+        const trustedTlds = [
+            "com", "org", "net", "edu", "gov", 
+            "int", "mil", "co", "info", "name", 
+            "pro", "us", "eu", "ca", "uk", 
+            "de", "jp", "au", "fr", "it", 
+            "nl", "se", "es", "ch", "be", 
+            "at", "fi", "no", "dk", "cz"
+        ];        
+        const suspiciousTlds = [
+            "tk", "ml", "ga", "cf", "gq", 
+            "ru", "xyz", "top", "club", "win", 
+            "date", "download", "pw", "space", 
+            "work", "loan", "shop", "stream", 
+            "buzz", "best", "link", "win", "click"
+        ];        
+        const suspiciousKeywords = [
+            "free", "win", "prize", "gift", "click", 
+            "verify", "update", "urgent", "limited", 
+            "money", "reward", "claim", "winner", 
+            "bonus", "exclusive", "instant", "guaranteed", 
+            "promo", "offer", "cash", "contest", 
+            "freebie", "freegift", "deal", "coupon", 
+            "earn", "discount", "sale", "alert", 
+            "emergency", "password", "login", "secure"
+        ];
+       
         let messages = [];
         let allGood = true;
 
