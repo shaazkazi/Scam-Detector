@@ -1,0 +1,219 @@
+/* General Styles */
+body {
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #121212;
+    color: #ffffff;
+}
+
+/* Header */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    background-color: #1f1f1f;
+    border-bottom: 2px solid #ffba08;
+}
+
+h1 {
+    font-size: 24px;
+    margin: 0;
+    color: #ffba08;
+}
+
+header p {
+    margin: 10px 0 0;
+    font-size: 14px;
+    color: #ccc;
+}
+
+.theme-toggle-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.theme-toggle-button img {
+    width: 24px;
+    height: 24px;
+}
+
+/* Main */
+main {
+    text-align: center;
+    margin-top: 30px;
+}
+
+input[type="text"] {
+    width: 80%;
+    padding: 10px;
+    font-size: 16px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    outline: none;
+}
+
+.button-container {
+    margin-top: 10px;
+}
+
+button {
+    padding: 10px 20px;
+    font-size: 16px;
+    margin: 5px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #ffba08;
+    color: #000000;
+}
+
+.paste-button {
+    background-color: #444444;
+    color: #ffffff;
+}
+
+/* Result Styles */
+.result {
+    margin: 20px auto;
+    padding: 15px;
+    border-radius: 10px;
+    width: 90%;
+    display: flex;
+    flex-direction: row; /* Ensure items are aligned horizontally */
+    align-items: center; /* Vertically center the items */
+    gap: 15px;
+    background-color: rgba(0, 0, 0, 0.1);
+    text-align: left;
+}
+
+.result img {
+    width: 50px;
+    height: 50px;
+    object-fit: contain;
+    vertical-align: middle;
+}
+
+.result ul {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.result ul li {
+    margin-bottom: 5px;
+}
+
+/* Result Text */
+.result p {
+    font-weight: bold;
+    margin-top: 0;
+}
+
+/* Safe and Danger Results */
+.result.safe {
+    background-color: #2d6a4f;
+    color: #ffffff;
+}
+
+.result.danger {
+    background-color: #d90429;
+    color: #ffffff;
+}
+
+.result ul li {
+    list-style-type: disc;
+    margin-left: 20px; /* Adjusts the bullet point margin */
+}
+
+/* Dark Mode Toggle */
+body.dark-mode {
+    background-color: #121212;
+    color: #ffffff;
+}
+
+body.light-mode {
+    background-color: #ffffff;
+    color: #000000;
+}
+
+/* Footer */
+footer {
+    text-align: center;
+    margin-top: 30px;
+    padding: 10px 0;
+    background-color: #1f1f1f;
+    color: #ffffff;
+}
+
+footer p {
+    margin: 0;
+}
+
+/* Result Title */
+.error-title, .safe-title {
+    font-family: 'Poppins', sans-serif;
+    background-color: #dc3545;
+    font-weight: 600;  /* Bold the title */
+    font-size: 22px;
+    color: #ffffff;
+}
+
+.safe-title {
+    background-color: #28a745;
+}
+
+/* Recommendation Text */
+.safe-recommendation, .error-recommendation {
+    font-family: 'Poppins', sans-serif;
+    font-size: 18px;
+    font-weight: bold;
+    color: #ffffff;
+    padding: 10px;
+    border-radius: 5px;
+    width: 100%;
+    text-align: center;
+    margin-top: 20px;
+}
+
+/* Safe Recommendation Styling */
+.safe-recommendation {
+    background-color: #28a745; /* Green background for safe recommendation */
+}
+
+/* Error Recommendation Styling */
+.error-recommendation {
+    background-color: #dc3545; /* Red background for error recommendation */
+}
+/* Add animation to result image */
+@keyframes highlightImage {
+    0% {
+        transform: scale(1);
+        opacity: 0.7;
+        box-shadow: none;
+    }
+    50% {
+        transform: scale(1.1);
+        opacity: 1;
+        
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+        box-shadow: none;
+    }
+}
+
+.result img {
+    width: 50px;
+    height: 50px;
+    object-fit: contain;
+    vertical-align: middle;
+    animation: highlightImage 1.5s ease-in-out infinite;  /* Infinite animation */
+}

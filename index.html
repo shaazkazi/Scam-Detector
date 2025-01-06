@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <title>URL Scam Detector</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="dark-mode">
+    <header>
+        <h1>🔍 URL Scam Detector</h1>
+        <button id="toggleTheme" class="theme-toggle-button">
+            <img id="themeIcon" src="moon-icon.svg" alt="Toggle Theme">
+        </button>
+    </header>
+    <main>
+        <input
+            id="urlInput"
+            type="text"
+            placeholder="Enter full URL (e.g., https://example.com)"
+            aria-label="URL Input"
+        />
+        <div class="button-container">
+            <button id="checkButton" class="check-button">Check URL</button>
+            <button id="pasteButton" class="paste-button">Paste</button>
+        </div>
+
+        <!-- Result Container -->
+        <div id="result" class="result" style="display: none;">
+            <img id="resultIcon" src="" alt="Result Icon" />
+            <div id="resultMessage"></div>
+        </div>
+    </main>
+    <footer>
+        <p>Built with ❤️ by Shariq Kazi to help the community stay safe online.</p>
+    </footer>
+    <script src="script.js"></script>
+</body>
+</html>
