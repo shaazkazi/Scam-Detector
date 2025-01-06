@@ -106,7 +106,7 @@ function checkURL() {
             messages.push("✅ HTTPS is enabled (The link is secure).");
         } else {
             allGood = false;
-            messages.push("❌ No HTTPS detected (The link is not secure).");
+            messages.push("⚠️ No HTTPS detected (The link is not secure).");
         }
 
         // Check TLD
