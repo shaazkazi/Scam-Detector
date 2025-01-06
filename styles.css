@@ -506,8 +506,4 @@ footer p {
         transform: scale(1);
     }
 }
-/* Ensure the input text appears in lowercase */
-#urlInput {
-    text-transform: lowercase;
-}
 
