@@ -125,9 +125,15 @@ function checkRedirects(url) {
         : [];
 }
 
-// Main function to check the URL
 async function checkURL() {
-    const url = urlInput.value.trim();
+    let url = urlInput.value.trim();
+
+    // Convert the protocol (http or https) to lowercase
+    if (url.startsWith("http://")) {
+        url = "http://" + url.slice(7).toLowerCase();
+    } else if (url.startsWith("https://")) {
+        url = "https://" + url.slice(8).toLowerCase();
+    }
 
     if (!url) {
         showResult("danger", "error-icon.svg", `
@@ -233,21 +239,3 @@ async function checkURL() {
         }, 1000);  // 1-second delay before hiding the loader
     }
 }
-
-urlInput.addEventListener("keypress", function(event) {
-    if (event.key === "Enter") {
-        checkURL();
-    }
-});
-
-document.getElementById("pasteButton").addEventListener("click", function() {
-    navigator.clipboard.readText().then(text => {
-        urlInput.value = text;
-        checkURL();
-    }).catch(e => {
-        console.error("Failed to paste clipboard contents", e);
-    });
-});
-
-themeToggle.addEventListener("click", toggleTheme);
-checkButton.addEventListener("click", checkURL);
