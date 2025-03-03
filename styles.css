@@ -824,3 +824,61 @@ body:not(.dark-mode) .theme-toggle {
 body:not(.dark-mode) .theme-toggle:hover svg path {
   stroke: var(--color-primary);
 }
+/* Add this to your styles.css file */
+.rating-container {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  margin-bottom: var(--space-md);
+}
+
+.rating-meter {
+  flex: 1;
+  height: 12px;
+  background-color: var(--color-border);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  position: relative;
+}
+
+.dark-mode .rating-meter {
+  background-color: var(--color-border-dark);
+}
+
+.rating-fill {
+  height: 100%;
+  width: 0%; /* Will be set by JS */
+  border-radius: var(--radius-full);
+  transition: width 1s ease, background-color 1s ease;
+}
+
+.rating-score {
+  font-weight: 700;
+  font-size: 1.2rem;
+  min-width: 75px;
+}
+
+.rating-score span:first-child {
+  color: var(--color-primary);
+}
+
+.dark-mode .rating-score span:first-child {
+  color: var(--color-primary-light);
+}
+
+/* Colors for different rating levels */
+.rating-fill.excellent {
+  background-color: var(--color-success);
+}
+
+.rating-fill.good {
+  background-color: var(--color-primary);
+}
+
+.rating-fill.moderate {
+  background-color: var(--color-warning);
+}
+
+.rating-fill.poor {
+  background-color: var(--color-danger);
+}
