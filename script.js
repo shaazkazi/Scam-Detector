@@ -169,10 +169,10 @@ async function checkURL() {
         let allGood = true;
 
         if (isHttps) {
-            messages.push("✅ HTTPS is enabled. Look at you, staying secure and classy.");
+            messages.push("✅ HTTPS is enabled. Stay secure and classy.");
         } else {
             allGood = false;
-            messages.push("⚠️ No HTTPS? This link might as well be in the Stone Age. Get with the times.");
+            messages.push("⚠️ No HTTPS? Not Secured.");
         }
 
         const dnsWarnings = checkDNS(domain);
@@ -189,9 +189,9 @@ async function checkURL() {
 
         if (suspiciousTlds.includes(`.${tld}`)) {
             allGood = false;
-            messages.push(`⚠️ Yikes! The domain ends with .${tld} — a red flag for scams. Proceed with caution.`);
+            messages.push(`⚠️ The domain ends with .${tld} — a red flag for scams. Proceed with caution.`);
         } else {
-            messages.push(`✅ This domain’s TLD is as trustworthy as your grandmother’s apple pie. (.${tld})`);
+            messages.push(`✅ This domain’s TLD is trustworthy. (.${tld})`);
         }
 
         const foundKeywords = suspiciousKeywords.filter(keyword => domain.includes(keyword));
@@ -218,7 +218,7 @@ async function checkURL() {
                     <ul>
                         ${messages.map(msg => `<li>${msg}</li>`).join("")}
                     </ul>
-                    <p class="error-recommendation">⚠️ Avoid this link if you value your sanity. It could be a scam.</p>
+                    <p class="error-recommendation">⚠️ Avoid this link, This is a scam.</p>
                 `);
             }
 
