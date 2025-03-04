@@ -185,7 +185,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (navigator.share && navigator.canShare({ files: [file] })) {
                     navigator.share({
                         title: 'URL Check Result',
-                        text: 'Check out this URL analysis result from Scam Detect!',
+                        text: 'Check out this URL analysis result from Scam Detect! visit https://scamdetect.netlify.app to scan your own URLs.',
                         files: [file]
                     }).then(() => {
                         showShareTooltip('Shared successfully!');
