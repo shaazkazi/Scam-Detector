@@ -200,7 +200,7 @@ function shareResults() {
     branding.style.color = isDarkMode ? '#94A3B8' : '#64748B';
     branding.style.fontSize = '12px';
     branding.style.marginTop = '8px';
-    branding.innerHTML = 'Scanned with Scam Detect';
+    branding.innerHTML = 'Scanned with Scam Detect, Created by Shaaz Kazi';
     container.appendChild(branding);
     
     // Add the container to body
@@ -225,7 +225,7 @@ function shareResults() {
             if (navigator.share && navigator.canShare({ files: [file] })) {
                 navigator.share({
                     title: 'URL Check Result',
-                    text: 'Check out this URL analysis result from Scam Detect! visit https://scamdetect.netlify.app to scan your own URLs. </br> Scanned URL is' + scannedUrl,
+                    text: 'Check out this URL analysis result from Scam Detect! visit https://scamdetect.netlify.app to scan your own URLs.',
                     files: [file]
                 }).then(() => {
                     showShareTooltip('Shared successfully!');
