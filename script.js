@@ -193,10 +193,20 @@ function shareResults() {
     // Copy only the necessary content
     const iconContainer = document.createElement('div');
     iconContainer.className = 'result-icon-container';
+    
+    // Create image with absolute URL to ensure it loads properly
     const resultIconClone = document.createElement('img');
-    resultIconClone.src = resultIcon.src;
+    // Convert relative URL to absolute URL
+    const iconSrc = resultIcon.src;
+    resultIconClone.src = iconSrc.startsWith('http') ? iconSrc : window.location.origin + (iconSrc.startsWith('/') ? '' : '/') + iconSrc;
     resultIconClone.alt = resultIcon.alt;
     resultIconClone.className = resultIcon.className;
+    
+    // Add inline image animation
+    resultIconClone.style.width = '48px';
+    resultIconClone.style.height = '48px';
+    resultIconClone.style.objectFit = 'contain';
+    
     iconContainer.appendChild(resultIconClone);
     
     const contentContainer = document.createElement('div');
@@ -251,44 +261,61 @@ function shareResults() {
    
     // Add the container to body
     document.body.appendChild(container);
-   
-    // Use html2canvas to capture the result as an image
-    html2canvas(container, {
-        backgroundColor: isDarkMode ? '#0F172A' : '#F8FAFC',
-        scale: 2, // Higher resolution
-        useCORS: true, // Allow images from other domains
-        logging: false // Reduce console noise
-    }).then(canvas => {
-        // Remove the temporary container
-        document.body.removeChild(container);
-       
-        // Convert canvas to blob
-        canvas.toBlob(function(blob) {
-            // Create file from blob
-            const file = new File([blob], 'url-check-result.png', { type: 'image/png' });
+    
+    // Ensure icon is loaded before capturing
+    const iconLoaded = new Promise((resolve) => {
+        if (resultIconClone.complete) {
+            resolve();
+        } else {
+            resultIconClone.onload = resolve;
+            resultIconClone.onerror = () => {
+                console.error("Failed to load icon image");
+                resolve(); // Resolve anyway to continue
+            };
+        }
+    });
+    
+    // Wait for icon to load before capturing
+    iconLoaded.then(() => {
+        // Use html2canvas to capture the result as an image
+        html2canvas(container, {
+            backgroundColor: isDarkMode ? '#0F172A' : '#F8FAFC',
+            scale: 2, // Higher resolution
+            useCORS: true, // Allow images from other domains
+            logging: false // Reduce console noise
+        }).then(canvas => {
+            // Remove the temporary container
+            document.body.removeChild(container);
            
-            // Check if Web Share API is available
-            if (navigator.share && navigator.canShare({ files: [file] })) {
-                navigator.share({
-                    title: 'URL Check Result',
-                    text: 'Check out this URL analysis result from Scam Detect! visit https://scamdetect.netlify.app to scan your own URLs.',
-                    files: [file]
-                }).then(() => {
-                    showShareTooltip('Shared successfully!');
-                }).catch(error => {
-                    console.error('Error sharing:', error);
+            // Convert canvas to blob
+            canvas.toBlob(function(blob) {
+                // Create file from blob
+                const file = new File([blob], 'url-check-result.png', { type: 'image/png' });
+               
+                // Check if Web Share API is available
+                if (navigator.share && navigator.canShare({ files: [file] })) {
+                    navigator.share({
+                        title: 'URL Check Result',
+                        text: 'Check out this URL analysis result from Scam Detect! visit https://scamdetect.netlify.app to scan your own URLs.',
+                        files: [file]
+                    }).then(() => {
+                        showShareTooltip('Shared successfully!');
+                    }).catch(error => {
+                        console.error('Error sharing:', error);
+                        downloadImage(canvas);
+                    });
+                } else {
+                    // Fallback - download the image
                     downloadImage(canvas);
-                });
-            } else {
-                // Fallback - download the image
-                downloadImage(canvas);
-            }
+                }
+            });
+        }).catch(error => {
+            console.error('Error generating image:', error);
+            alert('Failed to generate image for sharing.');
         });
-    }).catch(error => {
-        console.error('Error generating image:', error);
-        alert('Failed to generate image for sharing.');
     });
 }
+
 
     
         // Function to download canvas as image
