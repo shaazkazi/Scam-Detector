@@ -91,6 +91,13 @@
                         </div>
                         <div id="resultMessage"></div>
                     </div>
+                    <!-- Add this button after the result card -->
+<button id="shareButton" class="btn-secondary" style="display: none; margin-top: 10px;">
+    <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M18 8C19.6569 8 21 6.65685 21 5C21 3.34315 19.6569 2 18 2C16.3431 2 15 3.34315 15 5C15 5.12548 15.0077 5.24917 15.0227 5.37061L8.08261 9.25103C7.54305 8.48078 6.6582 8 5.66667 8C4.19391 8 3 9.19391 3 10.6667C3 12.1394 4.19391 13.3333 5.66667 13.3333C6.6582 13.3333 7.54305 12.8525 8.08261 12.0823L15.0227 15.9627C15.0077 16.0842 15 16.2079 15 16.3333C15 17.8061 16.1939 19 17.6667 19C19.1394 19 20.3333 17.8061 20.3333 16.3333C20.3333 14.8606 19.1394 13.6667 17.6667 13.6667C16.6751 13.6667 15.7903 14.1475 15.2507 14.9177L8.31064 11.0373C8.32561 10.9158 8.33333 10.7921 8.33333 10.6667C8.33333 10.5412 8.32561 10.4175 8.31064 10.296L15.2507 6.41564C15.7903 7.18589 16.6751 7.66667 17.6667 7.66667" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <span>Share Results</span>
+</button>
                 </div>
             </section>
 
@@ -122,5 +129,7 @@
     <script type="module" src="script.js"></script>
     <script type="module" src="src/js/detector.js"></script>
     <script type="module" src="src/api/urlChecker.js"></script>
+    <!-- Add this before your closing </body> tag -->
+<script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 </body>
 </html>

@@ -25,6 +25,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const closeButton = document.querySelector(".close-button");
     const ratingFill = document.getElementById('ratingFill');
     const ratingValue = document.getElementById('ratingValue');
+    const shareButton = document.getElementById('shareButton');
 
     // Log DOM elements to verify they exist
     console.log("URL input element:", urlInput);
@@ -103,6 +104,9 @@ document.addEventListener('DOMContentLoaded', function() {
         // Update the rating display
         updateRatingDisplay(riskScore);
         
+        // Show share button
+        shareButton.style.display = "flex";
+        
         // Scroll to result with smooth animation
         resultCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
@@ -156,211 +160,280 @@ document.addEventListener('DOMContentLoaded', function() {
             : [];
     }
 
-    async function checkURL() {
-        console.log("checkURL function called");
-        let url = urlInput.value.trim();
-
-        // Convert the protocol (http or https) to lowercase
-        if (url.startsWith("http://")) {
-            url = "http://" + url.slice(7).toLowerCase();
-        } else if (url.startsWith("https://")) {
-            url = "https://" + url.slice(8).toLowerCase();
+    // Function to share results as image
+    function shareResults() {
+        // Create a container for the result to be captured
+        const container = document.createElement('div');
+        container.className = 'share-canvas-container';
+        container.appendChild(resultCard.cloneNode(true));
+        document.body.appendChild(container);
+        
+        // Use html2canvas to capture the result as an image
+        html2canvas(container, {
+            backgroundColor: isDarkMode ? '#0F172A' : '#F8FAFC',
+            scale: 2 // Higher resolution
+        }).then(canvas => {
+            // Remove the temporary container
+            document.body.removeChild(container);
+            
+            // Convert canvas to blob
+            canvas.toBlob(function(blob) {
+                // Create file from blob
+                const file = new File([blob], 'url-check-result.png', { type: 'image/png' });
+                
+                // Check if Web Share API is available
+                if (navigator.share && navigator.canShare({ files: [file] })) {
+                    navigator.share({
+                        title: 'URL Check Result',
+                        text: 'Check out this URL analysis result from Scam Detect!',
+                        files: [file]
+                    }).then(() => {
+                        showShareTooltip('Shared successfully!');
+                    }).catch(error => {
+                        console.error('Error sharing:', error);
+                        downloadImage(canvas);
+                    });
+                } else {
+                    // Fallback - download the image
+                    downloadImage(canvas);
+                }
+            });
+        }).catch(error => {
+            console.error('Error generating image:', error);
+            alert('Failed to generate image for sharing.');
+        });
+    }
+    
+        // Function to download canvas as image
+        function downloadImage(canvas) {
+            const link = document.createElement('a');
+            link.download = 'url-check-result.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+            showShareTooltip('Image downloaded!');
         }
-
-        if (!url) {
-            showResult("danger", "/error-icon.svg", `
-                <div class="result-message">
-                    <p class="error-title">⚠️ Hmm... Something's missing here.</p>
-                    <ul>
-                        <li>Did you forget to enter a URL? Go ahead, try again.</li>
-                    </ul>
-                </div>
-            `, 0);
-            return;
+        
+        // Function to show share tooltip
+        function showShareTooltip(message) {
+            const tooltip = document.createElement('div');
+            tooltip.className = 'share-tooltip';
+            tooltip.textContent = message;
+            document.body.appendChild(tooltip);
+            
+            // Remove tooltip after animation completes
+            setTimeout(() => {
+                document.body.removeChild(tooltip);
+            }, 3000);
         }
-
-        try {
-            // Show loader before starting the check
-            loadingIndicator.style.display = "flex";
-            resultCard.style.display = "none";
-
-            // Check if URL has a protocol (http:// or https://)
-            if (!url.startsWith("http://") && !url.startsWith("https://")) {
+    
+        async function checkURL() {
+            console.log("checkURL function called");
+            let url = urlInput.value.trim();
+    
+            // Hide share button when starting a new check
+            shareButton.style.display = "none";
+    
+            // Convert the protocol (http or https) to lowercase
+            if (url.startsWith("http://")) {
+                url = "http://" + url.slice(7).toLowerCase();
+            } else if (url.startsWith("https://")) {
+                url = "https://" + url.slice(8).toLowerCase();
+            }
+    
+            if (!url) {
                 showResult("danger", "/error-icon.svg", `
                     <div class="result-message">
-                        <p class="error-title">⚠️ Oh no, no protocol?</p>
+                        <p class="error-title">⚠️ Hmm... Something's missing here.</p>
                         <ul>
-                            <li>Please add 'http://' or 'https://' in front of the URL. It's not that hard.</li>
+                            <li>Did you forget to enter a URL? Go ahead, try again.</li>
                         </ul>
                     </div>
-                `, 30);
+                `, 0);
                 return;
             }
-
-            const parsedUrl = new URL(url);
-            const domain = parsedUrl.hostname;
-            const tld = domain.split(".").pop();
-            const isHttps = parsedUrl.protocol === "https:";
-
-            let messages = [];
-            let allGood = true;
-            let riskScore = 0;
-
-            if (isHttps) {
-                messages.push("✅ HTTPS is enabled. Stay secure and classy.");
-            } else {
-                allGood = false;
-                messages.push("⚠️ No HTTPS? Not Secured.");
-                riskScore += 15;
-            }
-
-            // Get all warnings BEFORE checking them
-            const dnsWarnings = checkDNS(domain);
-            const redirectWarnings = checkRedirects(url);
-            const foundKeywords = suspiciousKeywords.filter(keyword => domain.includes(keyword));
-            
-            // Now check each warning type
-            if (dnsWarnings.length > 0) {
-                allGood = false;
-                messages.push(...dnsWarnings);
-                riskScore += dnsWarnings.length * 10;
-            }
-
-            if (redirectWarnings.length > 0) {
-                allGood = false;
-                messages.push(...redirectWarnings);
-                riskScore += 20;
-            }
-
-            if (suspiciousTlds.includes(`.${tld}`)) {
-                allGood = false;
-                messages.push(`⚠️ The domain ends with .${tld} — a red flag for scams. Proceed with caution.`);
-                riskScore += 25;
-            } else {
-                messages.push(`✅ This domain's TLD is trustworthy. (.${tld})`);
-            }
-
-            if (foundKeywords.length > 0) {
-                allGood = false;
-                messages.push(`⚠️ Keywords like "${foundKeywords.join('", "')}"? Sounds fishy.`);
-                riskScore += foundKeywords.length * 15;
-            } else {
-                messages.push("✅ No suspicious keywords found. It's like a breath of fresh air.");
-            }
-
-            // Also perform the enhanced URL check
+    
             try {
-                const enhancedResult = await enhancedURLCheck(url);
-                if (enhancedResult.risk > 0) {
+                // Show loader before starting the check
+                loadingIndicator.style.display = "flex";
+                resultCard.style.display = "none";
+    
+                // Check if URL has a protocol (http:// or https://)
+                if (!url.startsWith("http://") && !url.startsWith("https://")) {
+                    showResult("danger", "/error-icon.svg", `
+                        <div class="result-message">
+                            <p class="error-title">⚠️ Oh no, no protocol?</p>
+                            <ul>
+                                <li>Please add 'http://' or 'https://' in front of the URL. It's not that hard.</li>
+                            </ul>
+                        </div>
+                    `, 30);
+                    return;
+                }
+    
+                const parsedUrl = new URL(url);
+                const domain = parsedUrl.hostname;
+                const tld = domain.split(".").pop();
+                const isHttps = parsedUrl.protocol === "https:";
+    
+                let messages = [];
+                let allGood = true;
+                let riskScore = 0;
+    
+                if (isHttps) {
+                    messages.push("✅ HTTPS is enabled. Stay secure and classy.");
+                } else {
                     allGood = false;
-                    messages.push(`⚠️ Enhanced security check flagged this URL (Risk: ${enhancedResult.risk})`);
-                    messages.push(...enhancedResult.flags.map(flag => `⚠️ ${flag}`));
-                    riskScore += enhancedResult.risk;
-                } else {
-                    messages.push("✅ Enhanced security check passed.");
+                    messages.push("⚠️ No HTTPS? Not Secured.");
+                    riskScore += 15;
                 }
-            } catch (error) {
-                console.error("Error performing enhanced check:", error);
+    
+                // Get all warnings BEFORE checking them
+                const dnsWarnings = checkDNS(domain);
+                const redirectWarnings = checkRedirects(url);
+                const foundKeywords = suspiciousKeywords.filter(keyword => domain.includes(keyword));
+                
+                // Now check each warning type
+                if (dnsWarnings.length > 0) {
+                    allGood = false;
+                    messages.push(...dnsWarnings);
+                    riskScore += dnsWarnings.length * 10;
+                }
+    
+                if (redirectWarnings.length > 0) {
+                    allGood = false;
+                    messages.push(...redirectWarnings);
+                    riskScore += 20;
+                }
+    
+                if (suspiciousTlds.includes(`.${tld}`)) {
+                    allGood = false;
+                    messages.push(`⚠️ The domain ends with .${tld} — a red flag for scams. Proceed with caution.`);
+                    riskScore += 25;
+                } else {
+                    messages.push(`✅ This domain's TLD is trustworthy. (.${tld})`);
+                }
+    
+                if (foundKeywords.length > 0) {
+                    allGood = false;
+                    messages.push(`⚠️ Keywords like "${foundKeywords.join('", "')}"? Sounds fishy.`);
+                    riskScore += foundKeywords.length * 15;
+                } else {
+                    messages.push("✅ No suspicious keywords found. It's like a breath of fresh air.");
+                }
+    
+                // Also perform the enhanced URL check
+                try {
+                    const enhancedResult = await enhancedURLCheck(url);
+                    if (enhancedResult.risk > 0) {
+                        allGood = false;
+                        messages.push(`⚠️ Enhanced security check flagged this URL (Risk: ${enhancedResult.risk})`);
+                        messages.push(...enhancedResult.flags.map(flag => `⚠️ ${flag}`));
+                        riskScore += enhancedResult.risk;
+                    } else {
+                        messages.push("✅ Enhanced security check passed.");
+                    }
+                } catch (error) {
+                    console.error("Error performing enhanced check:", error);
+                }
+    
+                // Ensure risk score is capped at 100
+                riskScore = Math.min(100, riskScore);
+    
+                // Add a 1-second delay before showing the result
+                setTimeout(() => {
+                    if (allGood) {
+                        showResult("safe", "/safe-icon.svg", `
+                            <div class="result-message">
+                                <p class="safe-title">✅ Congratulations, You Found a Safe Link!</p>
+                                <ul>
+                                    ${messages.map(msg => `<li>${msg}</li>`).join("")}
+                                </ul>
+                                <p class="safe-recommendation">✅ My recommendation: Go ahead, click it, I guess.</p>
+                            </div>
+                        `, riskScore);
+                    } else {
+                        showResult("danger", "/danger-icon.svg", `
+                            <div class="result-message">
+                                <p class="error-title">⚠️ Potential Scam, Do Not Click!</p>
+                                <ul>
+                                    ${messages.map(msg => `<li>${msg}</li>`).join("")}
+                                </ul>
+                                <p class="error-recommendation">⚠️ Avoid this link, This is a scam.</p>
+                            </div>
+                        `, riskScore);
+                    }
+    
+                    // Update history after checking the URL
+                    updateHistory(url);
+                }, 1000);  // 1-second delay
+            } catch (e) {
+                console.error("Error checking URL:", e);
+                showResult("danger", "/error-icon.svg", `
+                    <div class="result-message">
+                        <p class="error-title">❌ Invalid URL</p>
+                        <ul>
+                            <li>Let's not be dramatic, just make sure you enter a proper URL next time.</li>
+                        </ul>
+                    </div>
+                `, 50);
+            } finally {
+                // Ensure the loader is visible for at least 1 second before being hidden
+                setTimeout(() => {
+                    loadingIndicator.style.display = "none";
+                }, 1000);  // 1-second delay before hiding the loader
             }
-
-            // Ensure risk score is capped at 100
-            riskScore = Math.min(100, riskScore);
-
-            // Add a 1-second delay before showing the result
-            setTimeout(() => {
-                if (allGood) {
-                    showResult("safe", "/safe-icon.svg", `
-                        <div class="result-message">
-                            <p class="safe-title">✅ Congratulations, You Found a Safe Link!</p>
-                            <ul>
-                                ${messages.map(msg => `<li>${msg}</li>`).join("")}
-                            </ul>
-                            <p class="safe-recommendation">✅ My recommendation: Go ahead, click it, I guess.</p>
-                        </div>
-                    `, riskScore);
-                } else {
-                    showResult("danger", "/danger-icon.svg", `
-                        <div class="result-message">
-                            <p class="error-title">⚠️ Potential Scam, Do Not Click!</p>
-                            <ul>
-                                ${messages.map(msg => `<li>${msg}</li>`).join("")}
-                            </ul>
-                            <p class="error-recommendation">⚠️ Avoid this link, This is a scam.</p>
-                        </div>
-                    `, riskScore);
-                }
-
-                // Update history after checking the URL
-                updateHistory(url);
-            }, 1000);  // 1-second delay
-        } catch (e) {
-            console.error("Error checking URL:", e);
-            showResult("danger", "/error-icon.svg", `
-                <div class="result-message">
-                    <p class="error-title">❌ Invalid URL</p>
-                    <ul>
-                        <li>Let's not be dramatic, just make sure you enter a proper URL next time.</li>
-                    </ul>
-                </div>
-            `, 50);
-        } finally {
-            // Ensure the loader is visible for at least 1 second before being hidden
-            setTimeout(() => {
-                loadingIndicator.style.display = "none";
-            }, 1000);  // 1-second delay before hiding the loader
         }
-    }
-
-    // Function to display URL history
-    function displayHistory() {
-        historyDiv.innerHTML = urlHistory.map(historyUrl => `
-            <div class="history-item">
-                <span class="history-url" data-url="${historyUrl}">${historyUrl}</span>
-                <button class="copy-button" aria-label="Copy URL" data-url="${historyUrl}">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="copy-icon">
-                                                <path d="M8 4V16C8 16.5304 8.21071 17.0391 8.58579 17.4142C8.96086 17.7893 9.46957 18 10 18H18C18.5304 18 19.0391 17.7893 19.4142 17.4142C19.7893 17.0391 20 16.5304 20 16V7.242C20 6.97556 19.9467 6.71181 19.8433 6.46624C19.7399 6.22068 19.5885 5.99824 19.398 5.812L16.188 2.602C16.0018 2.41148 15.7793 2.26012 15.5338 2.15673C15.2882 2.05334 15.0244 2.00001 14.758 2H10C9.46957 2 8.96086 2.21071 8.58579 2.58579C8.21071 2.96086 8 3.46957 8 4Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M16 18V20C16 20.5304 15.7893 21.0391 15.4142 21.4142C15.0391 21.7893 14.5304 22 14 22H6C5.46957 22 4.96086 21.7893 4.58579 21.4142C4.21071 21.0391 4 20.5304 4 20V8C4 7.46957 4.21071 6.96086 4.58579 6.58579C4.96086 6.21071 5.46957 6 6 6H8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                </button>
-            </div>
-        `).join('');
-
-        // Add event listeners to history URLs for rechecking
-        document.querySelectorAll('.history-url').forEach(item => {
-            item.addEventListener('click', () => {
-                urlInput.value = item.dataset.url;
-                checkURL();
-            });
-        });
-
-        // Add event listeners to copy buttons
-        document.querySelectorAll('.copy-button').forEach(button => {
-            button.addEventListener('click', (e) => {
-                const urlToCopy = e.currentTarget.dataset.url;
-                navigator.clipboard.writeText(urlToCopy).then(() => {
-                    // Show success icon after copying
-                    const successIcon = `
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="success-icon">
-                            <path d="M5 12L10 17L20 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    
+        // Function to display URL history
+        function displayHistory() {
+            historyDiv.innerHTML = urlHistory.map(historyUrl => `
+                <div class="history-item">
+                    <span class="history-url" data-url="${historyUrl}">${historyUrl}</span>
+                    <button class="copy-button" aria-label="Copy URL" data-url="${historyUrl}">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="copy-icon">
+                                                    <path d="M8 4V16C8 16.5304 8.21071 17.0391 8.58579 17.4142C8.96086 17.7893 9.46957 18 10 18H18C18.5304 18 19.0391 17.7893 19.4142 17.4142C19.7893 17.0391 20 16.5304 20 16V7.242C20 6.97556 19.9467 6.71181 19.8433 6.46624C19.7399 6.22068 19.5885 5.99824 19.398 5.812L16.188 2.602C16.0018 2.41148 15.7793 2.26012 15.5338 2.15673C15.2882 2.05334 15.0244 2.00001 14.758 2H10C9.46957 2 8.96086 2.21071 8.58579 2.58579C8.21071 2.96086 8 3.46957 8 4Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M16 18V20C16 20.5304 15.7893 21.0391 15.4142 21.4142C15.0391 21.7893 14.5304 22 14 22H6C5.46957 22 4.96086 21.7893 4.58579 21.4142C4.21071 21.0391 4 20.5304 4 20V8C4 7.46957 4.21071 6.96086 4.58579 6.58579C4.96086 6.21071 5.46957 6 6 6H8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
-                    `;
-                    button.innerHTML = successIcon;
-                    setTimeout(() => {
-                        button.innerHTML = `
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="copy-icon">
-                                <path d="M8 4V16C8 16.5304 8.21071 17.0391 8.58579 17.4142C8.96086 17.7893 9.46957 18 10 18H18C18.5304 18 19.0391 17.7893 19.4142 17.4142C19.7893 17.0391 20 16.5304 20 16V7.242C20 6.97556 19.9467 6.71181 19.8433 6.46624C19.7399 6.22068 19.5885 5.99824 19.398 5.812L16.188 2.602C16.0018 2.41148 15.7793 2.26012 15.5338 2.15673C15.2882 2.05334 15.0244 2.00001 14.758 2H10C9.46957 2 8.96086 2.21071 8.58579 2.58579C8.21071 2.96086 8 3.46957 8 4Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M16 18V20C16 20.5304 15.7893 21.0391 15.4142 21.4142C15.0391 21.7893 14.5304 22 14 22H6C5.46957 22 4.96086 21.7893 4.58579 21.4142C4.21071 21.0391 4 20.5304 4 20V8C4 7.46957 4.21071 6.96086 4.58579 6.58579C4.96086 6.21071 5.46957 6 6 6H8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                        `;
-                    }, 1000); // Reset copy icon after 1 second
-                }).catch(err => {
-                    console.error('Failed to copy text: ', err);
+                    </button>
+                </div>
+            `).join('');
+    
+            // Add event listeners to history URLs for rechecking
+            document.querySelectorAll('.history-url').forEach(item => {
+                item.addEventListener('click', () => {
+                    urlInput.value = item.dataset.url;
+                    checkURL();
                 });
             });
-        });
-    }
-
-    // Update history with clickable URLs and copy functionality
+    
+            // Add event listeners to copy buttons
+            document.querySelectorAll('.copy-button').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const urlToCopy = e.currentTarget.dataset.url;
+                    navigator.clipboard.writeText(urlToCopy).then(() => {
+                        // Show success icon after copying
+                        const successIcon = `
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="success-icon">
+                                <path d="M5 12L10 17L20 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        `;
+                        button.innerHTML = successIcon;
+                        setTimeout(() => {
+                            button.innerHTML = `
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="copy-icon">
+                                    <path d="M8 4V16C8 16.5304 8.21071 17.0391 8.58579 17.4142C8.96086 17.7893 9.46957 18 10 18H18C18.5304 18 19.0391 17.7893 19.4142 17.4142C19.7893 17.0391 20 16.5304 20 16V7.242C20 6.97556 19.9467 6.71181 19.8433 6.46624C19.7399 6.22068 19.5885 5.99824 19.398 5.812L16.188 2.602C16.0018 2.41148 15.7793 2.26012 15.5338 2.15673C15.2882 2.05334 15.0244 2.00001 14.758 2H10C9.46957 2 8.96086 2.21071 8.58579 2.58579C8.21071 2.96086 8 3.46957 8 4Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M16 18V20C16 20.5304 15.7893 21.0391 15.4142 21.4142C15.0391 21.7893 14.5304 22 14 22H6C5.46957 22 4.96086 21.7893 4.58579 21.4142C4.21071 21.0391 4 20.5304 4 20V8C4 7.46957 4.21071 6.96086 4.58579 6.58579C4.96086 6.21071 5.46957 6 6 6H8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            `;
+                        }, 1000); // Reset copy icon after 1 second
+                    }).catch(err => {
+                        console.error('Failed to copy text: ', err);
+                    });
+                });
+            });
+        }
+    
+            // Update history with clickable URLs and copy functionality
     function updateHistory(url) {
         // Add URL to history if it's not already there and it's a string
         if (typeof url === 'string' && !urlHistory.includes(url)) {
@@ -402,6 +475,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     themeToggle.addEventListener("click", toggleTheme);
     checkButton.addEventListener("click", checkURL);
+    
+    // Add event listener for the share button
+    shareButton.addEventListener("click", shareResults);
 
     // Modal functionality
     resultIcon.addEventListener("click", function() {

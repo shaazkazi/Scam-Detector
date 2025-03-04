@@ -882,3 +882,48 @@ body:not(.dark-mode) .theme-toggle:hover svg path {
 .rating-fill.poor {
   background-color: var(--color-danger);
 }
+/* Share Button Styles */
+#shareButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  margin: var(--space-md) auto;
+  width: 100%;
+  max-width: 200px;
+}
+
+.share-canvas-container {
+  position: absolute;
+  left: -9999px;
+  top: -9999px;
+}
+
+/* Social share tooltip */
+.share-tooltip {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: var(--color-success);
+  color: white;
+  padding: 8px 16px;
+  border-radius: var(--radius-md);
+  z-index: 1000;
+  box-shadow: var(--shadow-md);
+  animation: fadeIn 0.3s, fadeOut 0.3s 2.5s forwards;
+}
+
+.dark-mode .share-tooltip {
+  background-color: var(--color-primary);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
