@@ -185,19 +185,59 @@ function shareResults() {
         ${scannedUrl}
     `;
    
-    // Get the cloned result card
-    const resultClone = resultCard.cloneNode(true);
-    resultClone.style.borderRadius = '0 0 8px 8px';
+    // Create a clean version of the result card instead of cloning it
+    const cleanResultCard = document.createElement('div');
+    cleanResultCard.className = resultCard.className;
+    cleanResultCard.style.borderRadius = '0 0 8px 8px';
     
-    // Remove the share button from the cloned result if it exists
-    const shareButtonInClone = resultClone.querySelector('#shareButton');
-    if (shareButtonInClone) {
-        shareButtonInClone.remove();
-    }
+    // Copy only the necessary content
+    const iconContainer = document.createElement('div');
+    iconContainer.className = 'result-icon-container';
+    const resultIconClone = document.createElement('img');
+    resultIconClone.src = resultIcon.src;
+    resultIconClone.alt = resultIcon.alt;
+    resultIconClone.className = resultIcon.className;
+    iconContainer.appendChild(resultIconClone);
+    
+    const contentContainer = document.createElement('div');
+    contentContainer.className = 'result-content';
+    
+    const titleElement = document.createElement('h3');
+    titleElement.textContent = resultTitle.textContent;
+    contentContainer.appendChild(titleElement);
+    
+    // Add the rating container
+    const ratingContainer = document.createElement('div');
+    ratingContainer.className = 'rating-container';
+    
+    const ratingMeter = document.createElement('div');
+    ratingMeter.className = 'rating-meter';
+    
+    const ratingFillClone = document.createElement('div');
+    ratingFillClone.className = ratingFill.className;
+    ratingFillClone.style.width = ratingFill.style.width;
+    ratingMeter.appendChild(ratingFillClone);
+    
+    const ratingScoreElement = document.createElement('div');
+    ratingScoreElement.className = 'rating-score';
+    ratingScoreElement.innerHTML = `<span>${ratingValue.textContent}</span><span>/100</span>`;
+    
+    ratingContainer.appendChild(ratingMeter);
+    ratingContainer.appendChild(ratingScoreElement);
+    contentContainer.appendChild(ratingContainer);
+    
+    // Add the result message
+    const messageDiv = document.createElement('div');
+    messageDiv.innerHTML = resultMessage.innerHTML;
+    contentContainer.appendChild(messageDiv);
+    
+    // Assemble the clean result card
+    cleanResultCard.appendChild(iconContainer);
+    cleanResultCard.appendChild(contentContainer);
    
-    // Add URL display and result to container
+    // Add URL display and clean result to container
     container.appendChild(urlDisplay);
-    container.appendChild(resultClone);
+    container.appendChild(cleanResultCard);
    
     // Add branding to the bottom
     const branding = document.createElement('div');
