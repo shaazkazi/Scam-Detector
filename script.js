@@ -472,7 +472,7 @@ function shareResults() {
                                 <ul>
                                     ${messages.map(msg => `<li>${msg}</li>`).join("")}
                                 </ul>
-                                <p class="error-recommendation">⚠️ Avoid this link, This is a scam.</p>
+                                <p class="error-recommendation">⚠️ Avoid this link, This can be scam.</p>
                             </div>
                         `, riskScore);
                     }
