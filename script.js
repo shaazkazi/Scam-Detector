@@ -164,11 +164,11 @@ document.addEventListener('DOMContentLoaded', function() {
 function shareResults() {
     // Get the URL that was scanned
     const scannedUrl = urlInput.value.trim();
-    
+   
     // Create a container for the result to be captured
     const container = document.createElement('div');
     container.className = 'share-canvas-container';
-    
+   
     // Create an element to display the scanned URL
     const urlDisplay = document.createElement('div');
     urlDisplay.style.padding = '12px';
@@ -184,15 +184,21 @@ function shareResults() {
         <div style="margin-bottom:6px;color:${isDarkMode ? '#94A3B8' : '#64748B'};font-size:12px;">ANALYZED URL:</div>
         ${scannedUrl}
     `;
-    
+   
     // Get the cloned result card
     const resultClone = resultCard.cloneNode(true);
     resultClone.style.borderRadius = '0 0 8px 8px';
     
+    // Remove the share button from the cloned result if it exists
+    const shareButtonInClone = resultClone.querySelector('#shareButton');
+    if (shareButtonInClone) {
+        shareButtonInClone.remove();
+    }
+   
     // Add URL display and result to container
     container.appendChild(urlDisplay);
     container.appendChild(resultClone);
-    
+   
     // Add branding to the bottom
     const branding = document.createElement('div');
     branding.style.textAlign = 'center';
@@ -202,10 +208,10 @@ function shareResults() {
     branding.style.marginTop = '8px';
     branding.innerHTML = 'Scanned with Scam Detect, Created by Shaaz Kazi';
     container.appendChild(branding);
-    
+   
     // Add the container to body
     document.body.appendChild(container);
-    
+   
     // Use html2canvas to capture the result as an image
     html2canvas(container, {
         backgroundColor: isDarkMode ? '#0F172A' : '#F8FAFC',
@@ -215,12 +221,12 @@ function shareResults() {
     }).then(canvas => {
         // Remove the temporary container
         document.body.removeChild(container);
-        
+       
         // Convert canvas to blob
         canvas.toBlob(function(blob) {
             // Create file from blob
             const file = new File([blob], 'url-check-result.png', { type: 'image/png' });
-            
+           
             // Check if Web Share API is available
             if (navigator.share && navigator.canShare({ files: [file] })) {
                 navigator.share({
@@ -243,6 +249,7 @@ function shareResults() {
         alert('Failed to generate image for sharing.');
     });
 }
+
     
         // Function to download canvas as image
         function downloadImage(canvas) {
