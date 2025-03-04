@@ -161,48 +161,88 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Function to share results as image
-    function shareResults() {
-        // Create a container for the result to be captured
-        const container = document.createElement('div');
-        container.className = 'share-canvas-container';
-        container.appendChild(resultCard.cloneNode(true));
-        document.body.appendChild(container);
+function shareResults() {
+    // Get the URL that was scanned
+    const scannedUrl = urlInput.value.trim();
+    
+    // Create a container for the result to be captured
+    const container = document.createElement('div');
+    container.className = 'share-canvas-container';
+    
+    // Create an element to display the scanned URL
+    const urlDisplay = document.createElement('div');
+    urlDisplay.style.padding = '12px';
+    urlDisplay.style.backgroundColor = isDarkMode ? '#1E293B' : '#F1F5F9';
+    urlDisplay.style.borderRadius = '8px 8px 0 0';
+    urlDisplay.style.border = isDarkMode ? '1px solid #334155' : '1px solid #E2E8F0';
+    urlDisplay.style.borderBottom = 'none';
+    urlDisplay.style.fontWeight = 'bold';
+    urlDisplay.style.wordBreak = 'break-all';
+    urlDisplay.style.color = isDarkMode ? '#F1F5F9' : '#1E293B';
+    urlDisplay.style.fontSize = '14px';
+    urlDisplay.innerHTML = `
+        <div style="margin-bottom:6px;color:${isDarkMode ? '#94A3B8' : '#64748B'};font-size:12px;">ANALYZED URL:</div>
+        ${scannedUrl}
+    `;
+    
+    // Get the cloned result card
+    const resultClone = resultCard.cloneNode(true);
+    resultClone.style.borderRadius = '0 0 8px 8px';
+    
+    // Add URL display and result to container
+    container.appendChild(urlDisplay);
+    container.appendChild(resultClone);
+    
+    // Add branding to the bottom
+    const branding = document.createElement('div');
+    branding.style.textAlign = 'center';
+    branding.style.padding = '8px';
+    branding.style.color = isDarkMode ? '#94A3B8' : '#64748B';
+    branding.style.fontSize = '12px';
+    branding.style.marginTop = '8px';
+    branding.innerHTML = 'Scanned with Scam Detect';
+    container.appendChild(branding);
+    
+    // Add the container to body
+    document.body.appendChild(container);
+    
+    // Use html2canvas to capture the result as an image
+    html2canvas(container, {
+        backgroundColor: isDarkMode ? '#0F172A' : '#F8FAFC',
+        scale: 2, // Higher resolution
+        useCORS: true, // Allow images from other domains
+        logging: false // Reduce console noise
+    }).then(canvas => {
+        // Remove the temporary container
+        document.body.removeChild(container);
         
-        // Use html2canvas to capture the result as an image
-        html2canvas(container, {
-            backgroundColor: isDarkMode ? '#0F172A' : '#F8FAFC',
-            scale: 2 // Higher resolution
-        }).then(canvas => {
-            // Remove the temporary container
-            document.body.removeChild(container);
+        // Convert canvas to blob
+        canvas.toBlob(function(blob) {
+            // Create file from blob
+            const file = new File([blob], 'url-check-result.png', { type: 'image/png' });
             
-            // Convert canvas to blob
-            canvas.toBlob(function(blob) {
-                // Create file from blob
-                const file = new File([blob], 'url-check-result.png', { type: 'image/png' });
-                
-                // Check if Web Share API is available
-                if (navigator.share && navigator.canShare({ files: [file] })) {
-                    navigator.share({
-                        title: 'URL Check Result',
-                        text: 'Check out this URL analysis result from Scam Detect! visit https://scamdetect.netlify.app to scan your own URLs.',
-                        files: [file]
-                    }).then(() => {
-                        showShareTooltip('Shared successfully!');
-                    }).catch(error => {
-                        console.error('Error sharing:', error);
-                        downloadImage(canvas);
-                    });
-                } else {
-                    // Fallback - download the image
+            // Check if Web Share API is available
+            if (navigator.share && navigator.canShare({ files: [file] })) {
+                navigator.share({
+                    title: 'URL Check Result',
+                    text: 'Check out this URL analysis result from Scam Detect!',
+                    files: [file]
+                }).then(() => {
+                    showShareTooltip('Shared successfully!');
+                }).catch(error => {
+                    console.error('Error sharing:', error);
                     downloadImage(canvas);
-                }
-            });
-        }).catch(error => {
-            console.error('Error generating image:', error);
-            alert('Failed to generate image for sharing.');
+                });
+            } else {
+                // Fallback - download the image
+                downloadImage(canvas);
+            }
         });
-    }
+    }).catch(error => {
+        console.error('Error generating image:', error);
+        alert('Failed to generate image for sharing.');
+    });
+}
     
         // Function to download canvas as image
         function downloadImage(canvas) {
