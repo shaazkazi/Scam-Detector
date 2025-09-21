@@ -35,6 +35,7 @@ export const suspiciousTlds = [
     ".shop",         // Common TLD for fake shopping sites
     ".website",      // Sometimes used for spammy sites
     ".link",         // TLDs used for phishing and spammy sites
+    ".cyou",           // TLD often associated with scams and phishing
     ".pw",           // TLD often associated with scams and phishing
 ];
 
@@ -46,3 +47,4 @@ export const trustedTlds = [
     "nl", "se", "es", "ch", "be", 
     "at", "fi", "no", "dk", "cz"
 ];
+
