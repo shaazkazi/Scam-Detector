@@ -256,7 +256,7 @@ function shareResults() {
     branding.style.color = isDarkMode ? '#94A3B8' : '#64748B';
     branding.style.fontSize = '12px';
     branding.style.marginTop = '8px';
-    branding.innerHTML = 'Scanned with Scam Detect, Created by Shaaz Kazi';
+    branding.innerHTML = 'Scanned with Scam Detect, Created by Shariq Kazi';
     container.appendChild(branding);
    
     // Add the container to body
@@ -634,3 +634,4 @@ function shareResults() {
 
     console.log("All event listeners successfully attached");
 });
+
